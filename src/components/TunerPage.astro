@@ -7,7 +7,7 @@
 import SiteLayout from "@/layouts/SiteLayout.astro";
 import Tuner from "@/components/Tuner.astro";
 import { siteConfig } from "@/site/config";
-import { TUNINGS } from "@/lib/tunings";
+import { TUNINGS, tuningPath } from "@/lib/tunings";
 
 interface Props {
   title: string;
@@ -43,6 +43,17 @@ const jsonLd = {
     <section class="copy">
       <slot />
     </section>
+
+    <nav class="other-tunings" aria-label="Other tunings">
+      <h2>Other tunings</h2>
+      <ul>
+        {Object.values(TUNINGS)
+          .filter((t) => t.slug !== tuningSlug)
+          .map((t) => (
+            <li><a href={tuningPath(t.slug)}>{t.name}</a></li>
+          ))}
+      </ul>
+    </nav>
   </article>
 </SiteLayout>
 
@@ -75,5 +86,22 @@ const jsonLd = {
   .copy :global(p) {
     margin-bottom: 0.75rem;
     line-height: 1.6;
+  }
+  .other-tunings {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  }
+  .other-tunings h2 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .other-tunings ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
   }
 </style>

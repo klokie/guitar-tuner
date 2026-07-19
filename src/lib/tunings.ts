@@ -73,4 +73,16 @@ export const TUNINGS: Record<string, Tuning> = {
     "Half Step Down (E♭ A♭ D♭ G♭ B♭ E♭)",
     [39, 44, 49, 54, 58, 63],
   ),
+  "drop-c": makeTuning("drop-c", "Drop C (C G C F A D)", [36, 43, 48, 53, 57, 62]),
+  dadgad: makeTuning("dadgad", "DADGAD (D A D G A D)", [38, 45, 50, 55, 57, 62]),
+  "open-g": makeTuning("open-g", "Open G (D G D G B D)", [38, 43, 50, 55, 59, 62]),
+  "whole-step-down": makeTuning(
+    "whole-step-down",
+    "Whole Step Down (D G C F A D)",
+    [38, 43, 48, 53, 57, 62],
+  ),
 };
+
+/** Route for a tuning page: standard lives at the root. */
+export const tuningPath = (slug: string): string =>
+  slug === "standard" ? "/" : `/${slug}`;

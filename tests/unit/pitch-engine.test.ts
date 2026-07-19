@@ -117,6 +117,25 @@ describe("nearestString snap policy", () => {
   });
 });
 
+describe("nearestString on DADGAD's tight G–A gap (2 semitones)", () => {
+  const DADGAD = TUNINGS.dadgad!;
+
+  it("each of G3 and A3 matches itself exactly", () => {
+    const g3 = DADGAD.strings[3]!;
+    const a3 = DADGAD.strings[4]!;
+    expect(nearestString(g3.freq, DADGAD)?.string.note).toBe("G3");
+    expect(nearestString(a3.freq, DADGAD)?.string.note).toBe("A3");
+  });
+
+  it("a reading between them snaps to the closer one, never reads in-tune", () => {
+    const g3 = DADGAD.strings[3]!;
+    const slightlyTowardA = g3.freq * Math.pow(2, 80 / 1200); // 80¢ above G3
+    const match = nearestString(slightlyTowardA, DADGAD);
+    expect(match?.string.note).toBe("G3"); // 80¢ from G3 beats 120¢ from A3
+    expect(Math.abs(match!.cents)).toBeGreaterThan(5); // wildly out, not "in tune"
+  });
+});
+
 describe("PitchSmoother", () => {
   it("median-filters a single harmonic flip", () => {
     const s = new PitchSmoother(5);

@@ -57,6 +57,40 @@ describe("tuning definitions", () => {
     }
   });
 
+  it("drop-c is whole-step-down with the 6th dropped one more step", () => {
+    const whole = TUNINGS["whole-step-down"]!.strings;
+    const dropC = TUNINGS["drop-c"]!.strings;
+    expect(dropC[0]!.midi).toBe(whole[0]!.midi - 2);
+    for (let i = 1; i < 6; i++) {
+      expect(dropC[i]!.midi).toBe(whole[i]!.midi);
+    }
+    expect(dropC[0]!.note).toBe("C2");
+  });
+
+  it("dadgad changes exactly strings 6, 2, 1 from standard (each −2)", () => {
+    const std = TUNINGS.standard!.strings;
+    const dadgad = TUNINGS.dadgad!.strings;
+    const changed = [0, 4, 5];
+    for (let i = 0; i < 6; i++) {
+      const delta = changed.includes(i) ? -2 : 0;
+      expect(dadgad[i]!.midi).toBe(std[i]!.midi + delta);
+    }
+    expect(dadgad.map((s) => s.note.replace(/\d+$/, "")).join("")).toBe("DADGAD");
+  });
+
+  it("open-g open strings spell a G major chord", () => {
+    const notes = TUNINGS["open-g"]!.strings.map((s) => s.note.replace(/\d+$/, ""));
+    expect(notes).toEqual(["D", "G", "D", "G", "B", "D"]);
+  });
+
+  it("whole-step-down is every standard string minus two semitones", () => {
+    const std = TUNINGS.standard!.strings;
+    const whole = TUNINGS["whole-step-down"]!.strings;
+    for (let i = 0; i < 6; i++) {
+      expect(whole[i]!.midi).toBe(std[i]!.midi - 2);
+    }
+  });
+
   it("every tuning has six strings on a 3+3 peg layout", () => {
     for (const tuning of Object.values(TUNINGS)) {
       expect(tuning.strings).toHaveLength(6);

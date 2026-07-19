@@ -10,6 +10,10 @@ const ROUTES = [
   { dir: "", path: "/" },
   { dir: "drop-d", path: "/drop-d/" },
   { dir: "half-step-down", path: "/half-step-down/" },
+  { dir: "drop-c", path: "/drop-c/" },
+  { dir: "dadgad", path: "/dadgad/" },
+  { dir: "open-g", path: "/open-g/" },
+  { dir: "whole-step-down", path: "/whole-step-down/" },
 ];
 
 const html = (dir: string): string =>
