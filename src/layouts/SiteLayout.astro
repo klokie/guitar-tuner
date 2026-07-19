@@ -1,0 +1,71 @@
+---
+import BaseLayout from "@klokie/theme/layouts/BaseLayout.astro";
+import SiteHeader from "@klokie/theme/components/SiteHeader.astro";
+import SiteFooter from "@klokie/theme/components/SiteFooter.astro";
+import Analytics from "@klokie/theme/components/Analytics.astro";
+import "@klokie/theme/tokens/klokie.css";
+import { siteConfig } from "@/site/config";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  jsonLd?: object | object[];
+}
+const { title, description, ogImage, jsonLd } = Astro.props;
+const fullTitle = title ? `${title} — ${siteConfig.title}` : siteConfig.title;
+const canonical = new URL(Astro.url.pathname, siteConfig.url).href;
+const desc = description ?? siteConfig.description;
+const ogImageUrl = new URL(ogImage ?? "/og.png", siteConfig.url).href;
+
+// Escape so payload text can never break out of the <script> tag.
+const jsonLdHtml = jsonLd
+  ? JSON.stringify(jsonLd)
+      .replace(/</g, "\\u003c")
+      .replace(/>/g, "\\u003e")
+      .replace(/&/g, "\\u0026")
+  : null;
+---
+
+<BaseLayout
+  title={fullTitle}
+  description={desc}
+  preset={siteConfig.preset}
+  ogImage={ogImageUrl}
+>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.title} />
+    <meta property="og:locale" content={siteConfig.locale.replace("-", "_")} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={siteConfig.tagline} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    {jsonLdHtml && (
+      <script type="application/ld+json" is:inline set:html={jsonLdHtml} />
+    )}
+    <Analytics
+      posthog={siteConfig.analytics.posthog}
+      sentry={siteConfig.analytics.sentry}
+    />
+  </Fragment>
+  <SiteHeader
+    title={siteConfig.title}
+    tagline={siteConfig.tagline}
+    monogram={siteConfig.monogram}
+    nav={siteConfig.nav}
+  />
+  <main>
+    <slot />
+  </main>
+  <SiteFooter
+    copyrightName={siteConfig.copyrightName}
+    social={siteConfig.social}
+    credit={{ label: "Made with ❤️ by Klokie.com", href: "https://klokie.com" }}
+  />
+</BaseLayout>

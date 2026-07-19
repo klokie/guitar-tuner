@@ -1,0 +1,38 @@
+---
+import TunerPage from "@/components/TunerPage.astro";
+---
+
+<TunerPage
+  title="Online Guitar Tuner — Free, with Microphone"
+  description="Tune your guitar online in standard tuning (E A D G B E) using your microphone. Free, no app install, no sign-up. Works on phones and laptops; audio never leaves your device."
+  heading="Tune your guitar"
+  tuningSlug="standard"
+>
+  <h2>How to tune your guitar with this page</h2>
+  <p>
+    Tap <strong>start</strong>, allow the microphone, and pluck one string at a
+    time close to your phone or laptop. The tuner hears the note, highlights
+    which tuning peg belongs to that string on the headstock diagram, and tells
+    you whether the pitch is too low or too high. Turn the peg a little at a
+    time until the needle centers and the string gets its checkmark.
+  </p>
+  <p>
+    New to guitar? The thickest string (closest to the ceiling when you hold
+    the guitar) is the <strong>low E</strong>. From there the strings go
+    E–A–D–G–B–E, thickest to thinnest. If the tuner picks the wrong string, tap
+    the right one below the tuner and it will listen for that string only.
+  </p>
+  <h2>Why tune in the browser?</h2>
+  <p>
+    Nothing to install and nothing to sign up for — this page is the whole
+    tuner. Your audio is analyzed locally in your browser and never uploaded
+    anywhere. It works on iPhone, Android, and any laptop with a microphone.
+  </p>
+  <h2>No microphone available?</h2>
+  <p>
+    If the microphone is blocked, the tuner switches to reference tones: play
+    each string's note and match it by ear. It's harder for beginners than the
+    live needle, so if you can, open this page in your regular browser and
+    allow the mic.
+  </p>
+</TunerPage>

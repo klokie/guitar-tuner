@@ -1,0 +1,35 @@
+{
+  "name": "guitar-tuner",
+  "version": "0.1.0",
+  "description": "Free online guitar tuner — microphone in, beginner-first, no install.",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.10.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:seo": "vitest run --config vitest.seo.config.ts",
+    "pretest:e2e": "node tests/fixtures/generate-tones.mjs",
+    "test:e2e": "playwright test",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.2.1",
+    "@klokie/theme": "github:klokie/klokie-theme",
+    "astro": "^5.0.0",
+    "pitchy": "^4.1.0",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.0",
+    "vitest": "^3.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

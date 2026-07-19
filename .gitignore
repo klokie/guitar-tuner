@@ -1,0 +1,12 @@
+node_modules
+.astro
+dist
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.wrangler
+tests/fixtures/generated
+test-results
+playwright-report

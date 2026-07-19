@@ -1,0 +1,79 @@
+---
+/**
+ * Shared shell for every tuning page: SEO wiring + tuner island + copy slot.
+ * Pages differ only in tuning data and copy — adding a guitar-family tuning
+ * is a tunings.ts entry plus one thin page.
+ */
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import Tuner from "@/components/Tuner.astro";
+import { siteConfig } from "@/site/config";
+import { TUNINGS } from "@/lib/tunings";
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  tuningSlug: string;
+}
+const { title, description, heading, tuningSlug } = Astro.props;
+const tuning = TUNINGS[tuningSlug]!;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: title,
+  url: new URL(Astro.url.pathname, siteConfig.url).href,
+  description,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  browserRequirements: "Requires a microphone for live tuning",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
+---
+
+<SiteLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="container">
+    <h1>{heading}</h1>
+    <p class="strings-line">
+      {tuning.strings.map((s) => s.note.replace(/\d+$/, "")).join(" – ")}
+    </p>
+
+    <Tuner tuningSlug={tuningSlug} />
+
+    <section class="copy">
+      <slot />
+    </section>
+  </article>
+</SiteLayout>
+
+<style>
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    margin-bottom: 0.25rem;
+    text-align: center;
+  }
+  .strings-line {
+    text-align: center;
+    opacity: 0.7;
+    margin-bottom: 2rem;
+    letter-spacing: 0.2em;
+  }
+  .copy {
+    margin-top: 3rem;
+  }
+  .copy :global(h2) {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.5rem;
+  }
+  .copy :global(p) {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+</style>

@@ -1,0 +1,44 @@
+name: Check, test & build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # No pnpm version here — package.json's packageManager field pins it.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - run: pnpm test
+
+      - run: pnpm build
+        env:
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://tuner.klokie.com' }}
+
+      - run: pnpm test:seo
+        env:
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://tuner.klokie.com' }}
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm test:e2e
+        env:
+          CI: "true"

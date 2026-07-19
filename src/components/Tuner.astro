@@ -1,0 +1,284 @@
+---
+import { TUNINGS } from "@/lib/tunings";
+
+interface Props {
+  tuningSlug: string;
+}
+const { tuningSlug } = Astro.props;
+const tuning = TUNINGS[tuningSlug];
+if (!tuning) throw new Error(`Unknown tuning: ${tuningSlug}`);
+
+// 3+3 right-handed headstock, viewed from the front:
+// left column bottom→top = strings 6,5,4; right column bottom→top = 1,2,3.
+const pegY = [150, 95, 40];
+---
+
+<div class="tuner" data-tuner data-tuning={tuning.slug}>
+  <section class="panel" data-tuner-start-panel>
+    <button class="start" data-tuner-start type="button">
+      ▶ Tap to start tuning
+    </button>
+    <p class="privacy">
+      Uses your microphone. All audio is processed locally in your browser and
+      never uploaded.
+    </p>
+  </section>
+
+  <section class="panel" data-tuner-live hidden>
+    <div class="level" data-tuner-level aria-hidden="true"><i></i></div>
+
+    <div class="readout">
+      <div class="note" data-tuner-note aria-live="polite">–</div>
+      <div class="cents" data-tuner-cents></div>
+    </div>
+
+    <div class="gauge" aria-hidden="true">
+      <div class="needle" data-tuner-needle></div>
+      <div class="gauge-center"></div>
+    </div>
+
+    <p class="status" data-tuner-status aria-live="polite">
+      Pluck one string at a time, close to your device.
+    </p>
+
+    <svg
+      class="headstock"
+      viewBox="0 0 160 190"
+      role="img"
+      aria-label={`Headstock diagram for ${tuning.name}`}
+    >
+      <path
+        d="M55 5 h50 l15 25 v155 h-80 v-155 z"
+        class="headstock-body"
+      ></path>
+      {tuning.strings.map((s, i) => (
+        <g
+          data-peg
+          data-string={s.note}
+          class="peg"
+        >
+          <circle
+            cx={s.peg.side === "left" ? 30 : 130}
+            cy={pegY[s.peg.slot]}
+            r="14"
+            class="peg-circle"
+          />
+          <text
+            x={s.peg.side === "left" ? 30 : 130}
+            y={pegY[s.peg.slot]! + 5}
+            text-anchor="middle"
+            class="peg-label"
+          >
+            {s.note.replace(/\d+$/, "")}
+          </text>
+        </g>
+      ))}
+    </svg>
+  </section>
+
+  <section class="panel" data-tuner-fallback hidden>
+    <p class="fallback-reason" data-tuner-fallback-reason></p>
+    <div class="tones">
+      {tuning.strings.map((s) => (
+        <button
+          class="tone"
+          type="button"
+          data-tuner-tone={s.freq.toFixed(2)}
+        >
+          ♪ {s.note}
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <div class="strings" role="group" aria-label="Select a string">
+    <button class="string string--active-mode" data-tuner-auto type="button">
+      Auto
+    </button>
+    {tuning.strings.map((s, i) => (
+      <button
+        class="string"
+        data-tuner-string={i}
+        type="button"
+        aria-label={`Tune string ${6 - i} (${s.note})`}
+      >
+        {s.note}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  import { initTuner } from "@/scripts/tuner-controller";
+  document
+    .querySelectorAll<HTMLElement>("[data-tuner]")
+    .forEach((root) => initTuner(root));
+</script>
+
+<style>
+  .tuner {
+    max-width: 32rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .panel {
+    padding: 1rem 0;
+  }
+  .start {
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: var(--color-accent, #2b6cb0);
+    color: var(--color-bg, #fff);
+  }
+  .privacy {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    max-width: 24rem;
+    margin: 0.75rem auto 0;
+  }
+  .level {
+    height: 4px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .level i {
+    display: block;
+    height: 100%;
+    background: var(--color-accent, #2b6cb0);
+    transform-origin: left;
+    transform: scaleX(var(--level, 0));
+    transition: transform 60ms linear;
+  }
+  .readout .note {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .readout .cents {
+    font-size: 1.25rem;
+    min-height: 1.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .gauge {
+    position: relative;
+    height: 90px;
+    margin: 1rem auto;
+    max-width: 20rem;
+    border-bottom: 2px solid currentColor;
+  }
+  .needle {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    height: 80px;
+    background: currentColor;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(calc(var(--cents, 0) * 0.9deg));
+    transition: transform 80ms linear;
+  }
+  .tuner--in-tune .needle {
+    background: var(--color-success, #2f855a);
+  }
+  .tuner--in-tune .note {
+    color: var(--color-success, #2f855a);
+  }
+  .gauge-center {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    height: 88px;
+    background: color-mix(in srgb, currentColor 30%, transparent);
+  }
+  .status {
+    min-height: 3em;
+    max-width: 26rem;
+    margin: 0 auto 1rem;
+  }
+  .headstock {
+    width: 160px;
+    margin: 0 auto;
+    display: block;
+  }
+  .headstock-body {
+    fill: color-mix(in srgb, currentColor 8%, transparent);
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  .peg-circle {
+    fill: color-mix(in srgb, currentColor 12%, transparent);
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  .peg-label {
+    font-size: 11px;
+    fill: currentColor;
+  }
+  .peg--active .peg-circle {
+    fill: var(--color-accent, #2b6cb0);
+    stroke: var(--color-accent, #2b6cb0);
+  }
+  .peg--active .peg-label {
+    fill: var(--color-bg, #fff);
+  }
+  .peg--done .peg-circle {
+    stroke: var(--color-success, #2f855a);
+    stroke-width: 3;
+  }
+  .strings {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .string {
+    min-width: 3rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .string--active,
+  .string--active-mode {
+    background: var(--color-accent, #2b6cb0);
+    color: var(--color-bg, #fff);
+    border-color: var(--color-accent, #2b6cb0);
+  }
+  .string--done::after {
+    content: " ✓";
+    color: var(--color-success, #2f855a);
+  }
+  .string--active.string--done::after,
+  .string--done.string--active::after {
+    color: inherit;
+  }
+  .tones {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .tone {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+  .fallback-reason {
+    max-width: 26rem;
+    margin: 0 auto 1rem;
+  }
+</style>
