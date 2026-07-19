@@ -7,8 +7,11 @@ const mkNav = (ua: string, gum = true): Navigator =>
     mediaDevices: gum ? { getUserMedia: () => Promise.resolve({} as MediaStream) } : undefined,
   }) as unknown as Navigator;
 
-const mkWin = (audio = true): Window =>
-  (audio ? { AudioContext: class {} } : {}) as unknown as Window;
+const mkWin = (audio = true, secure = true): Window =>
+  ({
+    ...(audio ? { AudioContext: class {} } : {}),
+    isSecureContext: secure,
+  }) as unknown as Window;
 
 const CHROME_UA =
   "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36";
@@ -31,6 +34,14 @@ describe("detectEnvironment", () => {
     expect(detectEnvironment(mkNav(ua), mkWin())).toEqual({
       ok: false,
       reason: "webview",
+    });
+  });
+
+  it("flags an insecure (plain-HTTP) context before blaming the browser", () => {
+    // LAN dev over http://192.168.x.x: browsers hide mediaDevices by policy.
+    expect(detectEnvironment(mkNav(CHROME_UA, false), mkWin(true, false))).toEqual({
+      ok: false,
+      reason: "insecure-context",
     });
   });
 

@@ -54,7 +54,9 @@ export function initTuner(root: HTMLElement): void {
   const smoother = new PitchSmoother();
   const buffer = new Float32Array(WINDOW_SIZE);
 
-  const showFallback = (reason: "webview" | "denied" | "unsupported" | "failed"): void => {
+  const showFallback = (
+    reason: "webview" | "insecure" | "denied" | "unsupported" | "failed",
+  ): void => {
     session.enterFallback(reason);
     startPanel.hidden = true;
     livePanel.hidden = true;
@@ -62,9 +64,11 @@ export function initTuner(root: HTMLElement): void {
     fallbackReason.textContent =
       reason === "webview"
         ? "This in-app browser blocks microphone access. Open this page in your regular browser (Safari or Chrome) for live tuning — or tune by ear below."
-        : reason === "denied"
-          ? "Microphone access was denied. You can still tune by ear: play each string's reference note and match it."
-          : "Live tuning isn't available in this browser. Play each string's reference note and match it by ear.";
+        : reason === "insecure"
+          ? "Live tuning needs a secure connection, and this page was opened over plain HTTP. Open https://tuner.klokie.com for the live tuner — or tune by ear below."
+          : reason === "denied"
+            ? "Microphone access was denied. You can still tune by ear: play each string's reference note and match it."
+            : "Live tuning isn't available in this browser. Play each string's reference note and match it by ear.";
   };
 
   const setActiveString = (index: number | null): void => {
@@ -151,7 +155,13 @@ export function initTuner(root: HTMLElement): void {
   startButton.addEventListener("click", async () => {
     const env = detectEnvironment();
     if (!env.ok) {
-      showFallback(env.reason === "webview" ? "webview" : "unsupported");
+      showFallback(
+        env.reason === "webview"
+          ? "webview"
+          : env.reason === "insecure-context"
+            ? "insecure"
+            : "unsupported",
+      );
       return;
     }
     startButton.disabled = true;

@@ -8,7 +8,10 @@
 
 export type AudioEnv =
   | { ok: true }
-  | { ok: false; reason: "webview" | "no-getusermedia" | "no-audiocontext" };
+  | {
+      ok: false;
+      reason: "webview" | "insecure-context" | "no-getusermedia" | "no-audiocontext";
+    };
 
 const WEBVIEW_UA =
   /\b(Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|GSA\/|TikTok|Snapchat)\b/i;
@@ -18,6 +21,10 @@ export function detectEnvironment(
   win: Window = window,
 ): AudioEnv {
   if (WEBVIEW_UA.test(nav.userAgent)) return { ok: false, reason: "webview" };
+  // Browsers only expose mediaDevices on HTTPS or localhost. Over plain HTTP
+  // (e.g. a LAN IP) the mic is missing by policy, not by browser capability —
+  // the UX message must say so or it blames the wrong thing.
+  if (win.isSecureContext === false) return { ok: false, reason: "insecure-context" };
   if (!nav.mediaDevices?.getUserMedia) return { ok: false, reason: "no-getusermedia" };
   if (!("AudioContext" in win) && !("webkitAudioContext" in win)) {
     return { ok: false, reason: "no-audiocontext" };
