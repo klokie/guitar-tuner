@@ -102,4 +102,21 @@ describe("tuning definitions", () => {
       expect(new Set(right.map((s) => s.peg.slot)).size).toBe(3);
     }
   });
+
+  it("places the 6th string (low) at the top of the left column, 4th at the bottom", () => {
+    // Regression: strings 6 and 4 were swapped (low E at the bottom, D at
+    // the top) until a user with a real guitar caught it.
+    const [s6, s5, s4] = TUNINGS.standard!.strings;
+    expect(s6!.peg).toEqual({ side: "left", slot: 2 }); // top
+    expect(s5!.peg).toEqual({ side: "left", slot: 1 }); // middle
+    expect(s4!.peg).toEqual({ side: "left", slot: 0 }); // bottom
+  });
+
+  it("places the 3rd string at the top of the right column, 1st at the bottom", () => {
+    const strings = TUNINGS.standard!.strings;
+    const [s3, s2, s1] = [strings[3]!, strings[4]!, strings[5]!];
+    expect(s3.peg).toEqual({ side: "right", slot: 2 }); // top
+    expect(s2.peg).toEqual({ side: "right", slot: 1 }); // middle
+    expect(s1.peg).toEqual({ side: "right", slot: 0 }); // bottom
+  });
 });

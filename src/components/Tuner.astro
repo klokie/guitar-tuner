@@ -9,7 +9,8 @@ const tuning = TUNINGS[tuningSlug];
 if (!tuning) throw new Error(`Unknown tuning: ${tuningSlug}`);
 
 // 3+3 right-handed headstock, viewed from the front:
-// left column bottom→top = strings 6,5,4; right column bottom→top = 1,2,3.
+// left column top→bottom = strings 6,5,4; right column top→bottom = 3,2,1.
+// pegY is indexed by slot (0 = bottom, 2 = top) — see TuningString.peg in tunings.ts.
 const pegY = [150, 95, 40];
 ---
 

@@ -31,7 +31,8 @@ export interface TuningString {
   freq: number;
   /**
    * Peg position on a 3+3 right-handed headstock viewed from the front:
-   * left column bottom→top = strings 6,5,4; right column bottom→top = 1,2,3.
+   * left column top→bottom = strings 6,5,4; right column top→bottom = 3,2,1.
+   * (slot 2 = top, slot 0 = bottom, on both sides.)
    */
   peg: { side: "left" | "right"; slot: 0 | 1 | 2 };
 }
@@ -45,12 +46,12 @@ export interface Tuning {
 
 /** Standard 3+3 peg layout for strings ordered 6th → 1st. */
 const PEGS: TuningString["peg"][] = [
-  { side: "left", slot: 0 }, // 6th (low)
+  { side: "left", slot: 2 }, // 6th (low) — top of the left column
   { side: "left", slot: 1 }, // 5th
-  { side: "left", slot: 2 }, // 4th
-  { side: "right", slot: 2 }, // 3rd
+  { side: "left", slot: 0 }, // 4th — bottom of the left column
+  { side: "right", slot: 2 }, // 3rd — top of the right column
   { side: "right", slot: 1 }, // 2nd
-  { side: "right", slot: 0 }, // 1st (high)
+  { side: "right", slot: 0 }, // 1st (high) — bottom of the right column
 ];
 
 const makeTuning = (slug: string, name: string, midis: number[]): Tuning => ({
