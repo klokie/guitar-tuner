@@ -23,6 +23,7 @@ export const siteConfig = {
       host:
         (import.meta.env.PUBLIC_POSTHOG_HOST as string | undefined) ??
         "https://eu.i.posthog.com",
+      cookieless: true,
     },
     sentry: {
       dsn: import.meta.env.PUBLIC_SENTRY_DSN as string | undefined,
